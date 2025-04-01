@@ -77,13 +77,14 @@ NB : parameters between brackets are optional parameters with default values.
 Launch cONTent.py extract doing :
 
 ```
-python cONTent.py extract [-h] -i INPUTFILEPATH -o OUTPUTFILEDIR
+python cONTent.py extract [-h] -i INPUTFILEPATH -o OUTPUTFILEDIR [-t NUM]
 ```
 
 where:
 
 - < INPUTFILEPATH > : input fastq file (/!\ SHOULD BE A FASTQ FILE AND NOT A FASTQ.GZ) path [mendatory]
-- < OUTPUTFILEDIR > : output directory path [mendatory]. The output file will be named after the input file name with the extension `.content`. 
+- < OUTPUTFILEDIR > : output directory path [mendatory]. The output file will be named after the input file name with the extension `.content`.
+- < NUM > : number of CPU you use, one cpu per file, default : all cpus available
 
 Information extraction is a time consuming process. We advise if possible to run one process per library rather than concatenating the libraries and running one process. The other tools from the cONTent suite are designed to merge information from multiple cONTent.py extract output files  
 
@@ -93,13 +94,14 @@ Information extraction is a time consuming process. We advise if possible to run
 Launch cONTent.py distrib doing :
 
 ```
-python cONTent.py distrib [-h] -input INPUTPATH -outdir OUTPUTPATH -prefix PREFIX [-fraction FRACTION]
+python cONTent.py distrib [-h] -input INPUTPATH -outdir OUTPUTPATH -prefix PREFIX [-fraction FRACTION] [-t NUM]
 ```
 
 - < INPUTPATH > : Input directory/file path. If the path point to a directory, all the '.content' files will be analysed (individually and together). [mendatory]
 - < OUTPUTPATH > : Output directory path. Nb: if the ouput directory does not exist, it will be created along with its parent directories. If only a directory name is provided, the directory will be created in the execution directory. In any case,if the directory exist, it will be overwritten as well as the files it might contain (if files with the same name exist). [mendatory]
 - < PREFIX > : Prefix used to name output files but also as plots' title (for global analysis). Spaces will be replaced with '\_' in the files names [mendatory].
 - < FRACTION > : fraction of reads to subsample per analysed library (distribution plot only). The biggest is the fraction, the longer the analysis will take. (default : 0.01)
+- < NUM > : number of CPU you use, one cpu per file, default : all cpus available
 
 ### coverage
 
