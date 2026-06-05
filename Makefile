@@ -1,11 +1,13 @@
-CXX = g++               # Compiler
-CXXFLAGS = -std=c++11    # Compiler flags
+CXX = g++ # Compiler
+CXXFLAGS = -std=c++11 -O3 -Wall # Compiler flags
+CXXLIB = -lz
 
-
-install:
+install: build
 	echo "Installing python requirements & installing the content module"
 	pip install -r requirements.txt
 	pip install -e .
+
+build: content/build/fastq_processor
 	echo "Building the fastq parser"
 	mkdir -p content/build/
-	$(CXX) $(CXXFLAGS) content/fastq_processor.cpp -o content/build/fastq_processor
+	$(CXX) $(CXXFLAGS) content/src/*.cpp content/src/*.h -o content/build/fastq_processor $(CXXLIB)

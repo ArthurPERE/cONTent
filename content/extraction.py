@@ -59,9 +59,15 @@ def extract_infos_from_fastq(fp_input, fp_output):
         sys.exit()
 
 def workers(input_fpath: str, outdir: str):
+    ipath = (
+        input_fpath 
+            if not input_fpath.endswith(".gz")
+            else input_fpath.removesuffix(".gz")
+    )
+
     output_fpath = os.path.join(
         outdir, 
-        os.path.splitext(os.path.basename(input_fpath))[0] + ".content"
+        os.path.splitext(os.path.basename(ipath))[0] + ".content"
     )
 
     ### Parse fastq file using the fastq_processor C++ program
@@ -78,7 +84,7 @@ def main(args):
 
     threads = cmn.number_thread(args.threads)
 
-    lst_files = cmn.lst_files(input_fpath, ".fastq")
+    lst_files = cmn.lst_files(input_fpath, ".fastq") + cmn.lst_files(input_fpath, ".fastq.gz")
 
     ## Create the output directory if it does not exist
     if not os.path.isdir(output_dir):

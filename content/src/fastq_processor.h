@@ -1,9 +1,10 @@
-#include <iostream>
-#include <fstream>
+#ifndef FASTQPROC
+#define FASTQPROC
+
+
 #include <string>
 #include <cmath>
-
-using namespace std;
+#include "FastqReader.h"
 
 class FastqProcessor {
 public:
@@ -12,7 +13,7 @@ public:
 
     void process_fastq_file() {
         //  Open the input file
-        ifstream input_file(inputFilePath);
+        FastqReader input_file(inputFilePath);
         if (!input_file.is_open()) {
             cerr << "Error: unable to open the input file" << inputFilePath << endl;
             return;
@@ -29,13 +30,10 @@ public:
         output_file << "read_name\tread_length\tread_avg_quality" << endl;
 
         //  Init the vars were the data will be stored.
-        string sequence;
-        string header;
-        string quality;
+        string sequence, header, quality, line;
         unsigned short int line_count = 0;
-        int i = 0;
-        bool all_quality_content=true;
         unsigned long int seq_len = 0;
+        bool all_quality_content=true;
 
 
         double tab_quality[129];
@@ -44,12 +42,11 @@ public:
         }
 
         //  Read the input file line per line
-        string line;
-        while (getline(input_file, line)) {
+        while (input_file.get_line(line)) {
             if (line[0] == '@' && all_quality_content) {  // header lines
                 if (!sequence.empty()) {
                     double avg_quality = 0.0;
-                    for (int i = 0; i < quality.length(); i++) {
+                    for (uint i = 0; i < quality.length(); i++) {
                         avg_quality += tab_quality[(int)quality[i] - 33];
                     }
                     avg_quality /= (double)quality.length();
@@ -57,13 +54,9 @@ public:
                     sequence.clear();
                     quality.clear();
                 }
-                for (char& c : line) {
-                    if (c != ' ') i++;
-                    else break;
-                }
-                header = line.substr(0, i);
+                size_t space_pos = line.find(' ');
+                header = (space_pos != string::npos) ? line.substr(1, space_pos - 1) : line.substr(1);
                 line_count = 1;
-                i = 0;
                 all_quality_content = false;
             } else if (line_count == 1) {  // Sequence
                 if (line == (string)"+") { 
@@ -74,11 +67,9 @@ public:
                 sequence += line;
             } else if (line_count == 3) {  // Quality
                 quality += line;
-                if (quality.length() == seq_len) { 
-                    all_quality_content=true;
-                }
+                if (quality.length() == seq_len) { all_quality_content=true; }
                 else if (quality.length() > seq_len) {
-                    cerr << "Error : The sequence " << header << " has an quality length superior to the sequence length" << endl;
+                    cerr << "Error : The Sequence and Quality lengths mismatch for read " << header << endl;
                     exit(EXIT_FAILURE);
                 }
             }
@@ -87,7 +78,7 @@ public:
         //  Compute the mean Phred quality Afficher le Phred quality score moyen de la dernière séquence du fichier fastq
         if (!sequence.empty()) {
             double avg_quality = 0.0;
-            for (int i = 0; i < quality.length(); i++) {
+            for (uint i = 0; i < quality.length(); i++) {
                 avg_quality += tab_quality[(int)quality[i] - 33];
             }
             avg_quality /= (double)quality.length();
@@ -95,7 +86,6 @@ public:
         }
 
         // Fermer les fichiers
-        input_file.close();
         output_file.close();
     }
 
@@ -105,22 +95,6 @@ private:
 };
 
 
-int main(int argc, char* argv[]) {
-    //  Check if the two filenames have been provided
-    if (argc < 3) {
-        cerr << "Missing input and/or output file path(s)" << endl;
-        return 1;
-    }
-
-    string inputFilePath = argv[1]; // Input Fastq file path
-    string outputFilePath = argv[2]; // Output text file path
-
-    FastqProcessor processor(inputFilePath, outputFilePath);
-    processor.process_fastq_file();
-
-    cout << "Fastq processing complete. Results saved in " << outputFilePath << "." << endl;
-
-    return 0;
-}
+#endif
 
 

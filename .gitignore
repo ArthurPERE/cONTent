@@ -8,3 +8,5 @@ truc.sh
 content/build/
 build/
 dist/
+fastq_test
+.vscode/
