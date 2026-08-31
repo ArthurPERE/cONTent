@@ -49,7 +49,7 @@ class GenomeCoverage:
     """
 
     def __init__(
-        self, df, genome_size, n=10, m=10, min_cov=20, min_length=1000, min_quality=12
+        self, df: pd.DataFrame, genome_size, n=10, m=10, min_cov=20, min_length=1000, min_quality=12
     ):
 
         self.genome_size = genome_size
@@ -61,10 +61,17 @@ class GenomeCoverage:
             (df.read_length >= min_length) & (df.read_avg_quality >= min_quality)
         ].copy()
 
+        if self.data.empty:
+            print("There is no data for the minlength and minquality required")
+            sys.exit(1)
+
     def split_length_space(self):
         """
         Split length space into n even intervals (log scale)
         """
+        print(self.data.read_length.min())
+        print(self.data.read_length.max())
+        print(self.n)
         self.scl_l = np.unique(
             np.flip(
                 np.geomspace(
@@ -130,8 +137,8 @@ class GenomeCoverage:
                   quality ({self.min_quality}) is inferior to the minimum 
                   coverage required ({self.min_cov})""")
             print("Please, re-run the program with a lower '-mincoverage' value")
-            sys.exit()
-        
+            sys.exit(1)
+
         else:
             self.coverage = df[df.coverage >= self.min_cov] 
 
@@ -157,7 +164,7 @@ def main(args):
     lst_fpath = cmn.lst_content_files(args.input)
     if len(lst_fpath) == 0:
         print("No .content file found at the given adress. Program will end")
-        sys.exit()
+        sys.exit(1)
 
     ### Create the output directory tree
     #   NB : existing files/directories will be overwriting.

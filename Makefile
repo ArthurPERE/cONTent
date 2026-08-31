@@ -7,7 +7,7 @@ install: build
 	pip install -r requirements.txt
 	pip install -e .
 
-build: content/build/fastq_processor
+build: content/src/*.cpp content/src/*.h
 	echo "Building the fastq parser"
 	mkdir -p content/build/
 	$(CXX) $(CXXFLAGS) content/src/*.cpp content/src/*.h -o content/build/fastq_processor $(CXXLIB)
